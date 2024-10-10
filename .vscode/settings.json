@@ -1,0 +1,10 @@
+{
+    "clangd.arguments": [
+        "--query-driver=/Users/y/.local/share/ArmGNUToolchain/13.3.rel1/arm-none-eabi/bin/arm-none-eabi-*",
+        "--fallback-style=google"
+    ],
+    "cortex-debug.armToolchainPath": "/Users/y/.local/share/ArmGNUToolchain/13.3.rel1/arm-none-eabi/bin",
+    "cortex-debug.gdbPath": "/Users/y/.local/share/ArmGNUToolchain/13.3.rel1/arm-none-eabi/bin/arm-none-eabi-gdb",
+    "cortex-debug.openocdPath": "/opt/homebrew/bin/openocd",
+    "cortex-debug.variableUseNaturalFormat": false
+}

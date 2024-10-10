@@ -1,0 +1,11 @@
+.cache
+CMakeFiles
+compile_commands.json
+Makefile
+cmake_install.cmake
+*.elf
+*.map
+*Cache.txt
+./build/** 
+CMakeP*
+
