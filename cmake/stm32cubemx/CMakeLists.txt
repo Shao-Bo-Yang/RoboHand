@@ -7,6 +7,7 @@ add_library(stm32cubemx INTERFACE)
 enable_language(C ASM)
 
 target_compile_definitions(stm32cubemx INTERFACE 
+	USE_FULL_LL_DRIVER 
 	USE_HAL_DRIVER 
 	STM32F427xx
     $<$<CONFIG:Debug>:DEBUG>
@@ -27,7 +28,6 @@ target_sources(stm32cubemx INTERFACE
     ../../Core/Src/main.c
     ../../Core/Src/gpio.c
     ../../Core/Src/freertos.c
-    ../../Core/Src/dma.c
     ../../Core/Src/tim.c
     ../../Core/Src/usart.c
     ../../Core/Src/stm32f4xx_it.c
@@ -46,9 +46,14 @@ target_sources(stm32cubemx INTERFACE
     ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c
     ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c
     ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.c
+    ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_rcc.c
+    ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_utils.c
+    ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_exti.c
     ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c
     ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c
-    ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c
+    ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usart.c
+    ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_gpio.c
+    ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_dma.c
     ../../Core/Src/system_stm32f4xx.c
     ../../Middlewares/Third_Party/FreeRTOS/Source/croutine.c
     ../../Middlewares/Third_Party/FreeRTOS/Source/event_groups.c

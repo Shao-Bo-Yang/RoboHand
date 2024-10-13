@@ -51,7 +51,7 @@
 osThreadId_t root_taskHandle;
 const osThreadAttr_t root_task_attributes = {
   .name = "root_task",
-  .stack_size = 512 * 4,
+  .stack_size = 640 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
 
@@ -70,9 +70,9 @@ void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName);
 /* USER CODE BEGIN 4 */
 void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName)
 {
-   /* Run time stack overflow checking is performed if
-   configCHECK_FOR_STACK_OVERFLOW is defined to 1 or 2. This hook function is
-   called if a stack overflow is detected. */
+    /* Run time stack overflow checking is performed if
+    configCHECK_FOR_STACK_OVERFLOW is defined to 1 or 2. This hook function is
+    called if a stack overflow is detected. */
 }
 /* USER CODE END 4 */
 
@@ -87,19 +87,19 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE END Init */
 
   /* USER CODE BEGIN RTOS_MUTEX */
-  /* add mutexes, ... */
+    /* add mutexes, ... */
   /* USER CODE END RTOS_MUTEX */
 
   /* USER CODE BEGIN RTOS_SEMAPHORES */
-  /* add semaphores, ... */
+    /* add semaphores, ... */
   /* USER CODE END RTOS_SEMAPHORES */
 
   /* USER CODE BEGIN RTOS_TIMERS */
-  /* start timers, add new ones, ... */
+    /* start timers, add new ones, ... */
   /* USER CODE END RTOS_TIMERS */
 
   /* USER CODE BEGIN RTOS_QUEUES */
-  /* add queues, ... */
+    /* add queues, ... */
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
@@ -107,11 +107,11 @@ void MX_FREERTOS_Init(void) {
   root_taskHandle = osThreadNew(root_task_handler, NULL, &root_task_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
-  /* add threads, ... */
+    /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_EVENTS */
-  /* add events, ... */
+    /* add events, ... */
   /* USER CODE END RTOS_EVENTS */
 
 }
@@ -126,10 +126,11 @@ void MX_FREERTOS_Init(void) {
 __weak void root_task_handler(void *argument)
 {
   /* USER CODE BEGIN root_task_handler */
-  /* Infinite loop */
-  for (;;) {
-    osDelay(1);
-  }
+    /* Infinite loop */
+    for (;;)
+    {
+        osDelay(1);
+    }
   /* USER CODE END root_task_handler */
 }
 

@@ -21,7 +21,13 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Debug")
 endif()
 
-set(COMPILE_OPTIONS)
+set(COMPILE_OPTIONS
+    -Wno-unused-parameter
+    -Wno-unused-includes
+
+    # -fexceptions
+    -D_LIBCPP_HAS_NO_THREADS=1
+)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
     list(APPEND COMPILE_OPTIONS -O3)
@@ -32,9 +38,12 @@ file(GLOB SRCS
     ./BSD/*.c
     ./Base/*.c
     ./Base/*.cc
-    ./Run/*.c
-    ./Run/*.cc
+    ./Run/**.c
+    ./Run/**.cc
+    ./Run/command_tasks/*.cc
 )
+execute_process(COMMAND rm STM32F427IIHx_FLASH.ld)
+execute_process(COMMAND cp STM32F427IIHx_FLASH_BK_.ld STM32F427IIHx_FLASH.ld)
 
 # Set the project name
 set(CMAKE_PROJECT_NAME RoboHand)
@@ -96,3 +105,6 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
 target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE
     ${COMPILE_OPTIONS}
 )
+
+message(NOTICE "Build Dir: " ${CMAKE_BINARY_DIR})
+install(CODE "execute_process(COMMAND /bin/sh ./install.sh ${CMAKE_BINARY_DIR} ${CMAKE_PROJECT_NAME})")

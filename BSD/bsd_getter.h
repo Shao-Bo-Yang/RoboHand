@@ -1,40 +1,67 @@
 #pragma once
 
+#include <FreeRTOS.h>
+
 #include <cstdint>
 #include <functional>
 
-#include "cmsis_os2.h"
-namespace bsd {
+extern "C"
+{
 
-template <typename Device>
-struct bsd_getter {
-  bsd_getter() : _device_mutex(osMutexNew(NULL)) {}
+#include <cmsis_gcc.h>
+#include <cmsis_os2.h>
+}
+namespace bsd
+{
 
-  static auto use_device(std::function<void(Device &)> &&callable,
-                         uint32_t timeout = osWaitForever) {
-    auto &&self = _self();
-    auto &&instance = _instance();
-    auto state = osMutexAcquire(self._device_mutex, timeout);
-    if (state == osOK) {
-      auto &instance_ = *static_cast<Device *>(&instance);
-      callable(instance_);
-      osMutexRelease(self._device_mutex);
+template <typename Device> struct bsd_getter
+{
+    bsd_getter() : _device_sema(osSemaphoreNew(1, 1, NULL))
+    {
     }
-    return state;
-  }
 
-  ~bsd_getter() { osMutexDelete(_device_mutex); }
+    static auto use_device(std::function<void(Device &)> &&callable, uint32_t timeout = osWaitForever)
+    {
+        auto &&self = _self();
+        auto &&instance = _instance();
+        if (__get_IPSR() != 0)
+        {
+            auto &instance_ = *static_cast<Device *>(&instance);
+            callable(instance_);
+            return osOK;
+        }
+        else
+        {
+            auto state = osSemaphoreAcquire(self._device_sema, timeout);
+            if (state == osOK)
+            {
+                auto &instance_ = *static_cast<Device *>(&instance);
+                callable(instance_);
+                osSemaphoreRelease(self._device_sema);
+            }
+            return state;
+        }
+    }
 
- private:
-  static auto &_instance() {
-    static Device instance{};
-    return instance;
-  }
+    ~bsd_getter()
+    {
+        osSemaphoreDelete(_device_sema);
+    }
 
-  static auto &_self() { return static_cast<bsd_getter &>(_instance()); }
+  protected:
+    static auto &_instance()
+    {
+        static Device instance{};
+        return instance;
+    }
 
- private:
-  osMutexId_t _device_mutex;
+    static auto &_self()
+    {
+        return static_cast<bsd_getter &>(_instance());
+    }
+
+  private:
+    osSemaphoreId_t _device_sema;
 };
 
-}  // namespace bsd
+} // namespace bsd
