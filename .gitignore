@@ -8,6 +8,6 @@ cmake_install.cmake
 build
 CMakePresets.json
 .cache
-/cmake_install.*
+cmake_install.*
 .cmake
 .DS_Store
