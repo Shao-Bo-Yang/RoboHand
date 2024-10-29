@@ -23,18 +23,24 @@ pwm_control_task::~pwm_control_task()
 
 pwm_control_task::pwm_control_task() : _pwm_channel_controls(), _pwm_channel_controls_sema(osSemaphoreNew(1, 1, NULL))
 {
-    decltype(_pwm_channel_controls[0].control_points) control_points = {
+    _control_points = {
         base::point{0, 0},
         base::point{0.42, 0},
         base::point{0.58, 1},
         base::point{1, 1},
     };
+    auto delta = 1.0 / _route.size();
+    std::vector control_point_vect(_control_points.begin(), _control_points.end());
+    for (int32_t i = 0; i < (int32_t)_route.size(); ++i)
+    {
+        base::bezier(control_point_vect, delta * i, _route[i]);
+    }
 
     for (int32_t i = 0; i < (int32_t)pwm_channels.size(); ++i)
     {
         auto ch = pwm_channels[i];
         _pwm_channel_controls[i] = {
-            control_points, ch, 0, 0, 0, 2, false,
+            ch, 0, 0, 0, 2, false,
         };
     }
 }
@@ -63,12 +69,19 @@ void pwm_control_task::operator()()
             {
                 auto delta = cur_tick - control.start_tick_count;
                 auto ratio = delta / (control.duration * 1000);
-                base::point point;
-                auto &control_points = control.control_points;
-                base::bezier(std::vector(control_points.begin(), control_points.end()), ratio, point);
-                auto duty = (control.destination_duty - control.recorded_duty) *
-                                std::min(std::max(point.y, float(0.0)), float(1.0)) +
-                            control.recorded_duty;
+                auto finded = std::lower_bound(_route.begin(), _route.end(), ratio,
+                                               [](const base::point &a, const float &b) { return a.x < b; });
+                float duty = 0;
+                if (finded == _route.end())
+                {
+                    duty = control.destination_duty;
+                }
+                else
+                {
+                    duty = (control.destination_duty - control.recorded_duty) *
+                               std::min(std::max(finded->y, float(0.0)), float(1.0)) +
+                           control.recorded_duty;
+                }
                 bsd::pwm::use_device([duty, &control](bsd::pwm &device) { device.set_duty(duty, control.ch); });
             }
         }

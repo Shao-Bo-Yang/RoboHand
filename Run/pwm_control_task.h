@@ -36,7 +36,6 @@ struct pwm_control_task : public task_generic<pwm_control_task>
   private:
     struct _pwm_channel_control
     {
-        std::array<base::point, 4> control_points;
         bsd::pwm_channel ch;
 
         float recorded_duty;
@@ -49,6 +48,8 @@ struct pwm_control_task : public task_generic<pwm_control_task>
     std::array<_pwm_channel_control, BSD_PWM_CHANNEL_COUNT> _pwm_channel_controls;
 
     osSemaphoreId_t _pwm_channel_controls_sema;
+    std::array<base::point, 4> _control_points;
+    std::array<base::point, 500> _route;
 
   private:
     pwm_control_task();
