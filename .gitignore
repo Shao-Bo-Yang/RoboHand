@@ -1,13 +1,13 @@
 CMakeFiles
 compile_commands.json
 Makefile
-cmake_install.cmake
 *.elf
 *.map
 *Cache.txt
-build
 CMakePresets.json
 .cache
 cmake_install.*
 .cmake
 .DS_Store
+./install_manifest.txt
+build/

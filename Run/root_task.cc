@@ -11,6 +11,7 @@
 #include "pwm.h"
 #include "pwm_control_task.h"
 #include "pwm_led_task.h"
+#include "switch.h"
 #include "task.h"
 #include "usart_log_task.h"
 #include "usart_rx.h"
@@ -43,6 +44,7 @@ void root_task_handler(void *argument)
     led::use_device([](led &device) { device.init(); });
     usart_rx::use_device([](usart_rx &device) { device.init(); });
     usart_tx::use_device([](usart_tx &device) { device.init(); });
+    switch_on::use_device([](switch_on &device) { device.init(); });
 
     pwm_led_task::instance().init("pwm_led_task", osPriorityLow);
     work_led_task::instance().init("work_led_task", osPriorityLow);
@@ -69,6 +71,7 @@ void root_task_handler(void *argument)
                                       {"set_angle_8", command_tasks::set_angle_task<bsd::pwm_channel::Ch8>},
                                       {"store_pwm_value", command_tasks::store_pwm_value},
                                       {"update_pwm_value", command_tasks::update_pwm_value},
+                                      {"switch", command_tasks::switch_on},
                                   });
     taskEXIT_CRITICAL();
 

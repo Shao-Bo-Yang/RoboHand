@@ -1,11 +1,13 @@
 #include "pwm_control_task.h"
 #include "app_time.h"
 #include "bezier.hh"
+#include "log.hh"
 #include "pwm.h"
 #include <algorithm>
 #include <array>
 #include <cmsis_os2.h>
 #include <cstdint>
+#include <sstream>
 #include <vector>
 
 namespace task
@@ -48,6 +50,15 @@ pwm_control_task::pwm_control_task() : _pwm_channel_controls(), _pwm_channel_con
 void pwm_control_task::operator()()
 {
 
+#ifdef DEBUG
+    struct _last
+    {
+        int duty;
+        uint64_t tick;
+    };
+    std::vector<_last> duties;
+#endif
+
     for (;;)
     {
         auto cur_tick = bsd::app_time::app_time_ms();
@@ -64,6 +75,16 @@ void pwm_control_task::operator()()
                 bsd::pwm::use_device(
                     [&control](bsd::pwm &device) { device.set_duty(control.destination_duty, control.ch); });
                 control.enable = false;
+#ifdef DEBUG
+                std::stringstream ss;
+                for (auto &i : duties)
+                {
+                    ss << i.duty << ", ";
+                }
+
+                base::log(ss.str());
+                duties.clear();
+#endif
             }
             else
             {
@@ -82,6 +103,18 @@ void pwm_control_task::operator()()
                                std::min(std::max(finded->y, float(0.0)), float(1.0)) +
                            control.recorded_duty;
                 }
+#ifdef DEBUG
+
+                if (duties.empty())
+                {
+                    duties.push_back({int(duty * 1000), cur_tick});
+                }
+                else if (cur_tick - duties.back().tick >= 20)
+                {
+                    duties.push_back({int(duty * 1000), cur_tick});
+                }
+
+#endif // DEBUG
                 bsd::pwm::use_device([duty, &control](bsd::pwm &device) { device.set_duty(duty, control.ch); });
             }
         }

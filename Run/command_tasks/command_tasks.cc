@@ -7,9 +7,35 @@
 #include "log.hh"
 #include "pwm.h"
 #include "pwm_control_task.h"
+#include "switch.h"
 
 namespace command_tasks
 {
+
+void switch_on(const std::vector<std::string> &args)
+{
+    auto status_str = args.front();
+    int status = 0;
+    std::stringstream ss(status_str);
+    ss >> status;
+
+    bsd::switch_on::use_device([status](bsd::switch_on &device) {
+        bool on = false;
+        if (status > 0)
+        {
+            device.on();
+            on = true;
+        }
+        else
+        {
+
+            device.off();
+            on = false;
+        }
+
+        base::log("switch: ", on ? "on" : "off");
+    });
+}
 
 void update_pwm_value(const std::vector<std::string> &args)
 {
@@ -71,12 +97,13 @@ void _set_angle_task(const std::vector<std::string> &args, std::function<void(fl
     double angle = 0;
     std::stringstream ss(angle_str);
     ss >> angle;
-    angle = std::max(std::min(angle, 180.0), -180.0);
+    angle = std::max(std::min(angle, 170.0), -170.0);
     angle += 180;
     auto ratio = angle / 360;
     auto duty = ratio * (0.125 - 0.025) + 0.025;
     func(duty);
-    base::log("Set Duty{ ch: ", (uint32_t)ch, ", angle: ",(int)angle ,  ", duty: ", (uint32_t)(100 * duty), " / 100", "}");
+    base::log("Set Duty{ ch: ", (uint32_t)ch, ", angle: ", (int)angle, ", duty: ", (uint32_t)(100 * duty), " / 100",
+              "}");
 }
 
 void _set_pwm_duty_task(const std::vector<std::string> &args, std::function<void(float duty)> func, bsd::pwm_channel ch)
