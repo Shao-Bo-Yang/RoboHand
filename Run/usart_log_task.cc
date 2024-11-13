@@ -82,6 +82,7 @@ void usart_log_task::operator()()
         osSemaphoreRelease(_full);
         work_led_task::instance().blink();
         _write(std::move(str));
+        osDelay(1);
     }
 }
 

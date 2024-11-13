@@ -29,17 +29,7 @@ void root_task_handler(void *argument)
     using namespace bsd;
     using namespace task;
     app_time::use_device([](app_time &device) { device.init(); });
-    pwm::use_device([](pwm &device) {
-        device.set_duty<pwm_channel::Ch1>(0.05);
-        device.set_duty<pwm_channel::Ch2>(0.05);
-        device.set_duty<pwm_channel::Ch3>(0.05);
-        device.set_duty<pwm_channel::Ch4>(0.05);
-        device.set_duty<pwm_channel::Ch5>(0.05);
-        device.set_duty<pwm_channel::Ch6>(0.05);
-        device.set_duty<pwm_channel::Ch7>(0.05);
-        device.set_duty<pwm_channel::Ch8>(0.05);
-        device.init();
-    });
+    pwm::use_device([](pwm &device) { device.init(); });
     flash::use_device([](flash &device) { device.init(); });
     led::use_device([](led &device) { device.init(); });
     usart_rx::use_device([](usart_rx &device) { device.init(); });
@@ -72,7 +62,27 @@ void root_task_handler(void *argument)
                                       {"store_pwm_value", command_tasks::store_pwm_value},
                                       {"update_pwm_value", command_tasks::update_pwm_value},
                                       {"switch", command_tasks::switch_on},
+                                      {"rotate", command_tasks::rotate},
+                                      {"grasp_ratio", command_tasks::grasp_ratio},
                                   });
+    double duties[8];
+    bsd::flash::use_device([&duties](bsd::flash &device) {
+        device.read_flash(reinterpret_cast<uint32_t *>(duties), sizeof(duties) / sizeof(uint32_t));
+    });
+    bsd::pwm::use_device([&duties](bsd::pwm &device) {
+        device.set_duty<bsd::pwm_channel::Ch1>(duties[0]);
+        device.set_duty<bsd::pwm_channel::Ch2>(duties[1]);
+        device.set_duty<bsd::pwm_channel::Ch3>(duties[2]);
+        device.set_duty<bsd::pwm_channel::Ch4>(duties[3]);
+        device.set_duty<bsd::pwm_channel::Ch5>(duties[4]);
+        device.set_duty<bsd::pwm_channel::Ch6>(duties[5]);
+        device.set_duty<bsd::pwm_channel::Ch7>(duties[6]);
+        device.set_duty<bsd::pwm_channel::Ch8>(duties[7]);
+    });
+#define DUTY(i) (int(100 * duties[i]))
+    base::log("Store Duty{ ch1: ", DUTY(0), ", ch2: ", DUTY(1), ", ch3: ", DUTY(2), ", ch4: ", DUTY(3),
+              ", ch5: ", DUTY(4), ", ch6: ", DUTY(5), ", ch7: ", DUTY(6), ", ch8: ", DUTY(7), " }");
+#undef DUTY
     taskEXIT_CRITICAL();
 
     osThreadTerminate(osThreadGetId());

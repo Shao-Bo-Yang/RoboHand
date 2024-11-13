@@ -1,5 +1,6 @@
 #include "command_tasks.h"
 
+#include <algorithm>
 #include <cstdint>
 #include <sstream>
 
@@ -123,6 +124,53 @@ void _set_pwm_duty_task(const std::vector<std::string> &args, std::function<void
     func(duty);
     // pwm::use_device([&duty, ch](pwm &device) { device.set_duty(duty, ch); });
     base::log("Set Duty{ ch: ", (uint32_t)ch, ", duty: ", (uint32_t)(100 * duty), " / 100", "}");
+}
+
+void rotate(const std::vector<std::string> &args)
+{
+    using bsd::pwm;
+    if (args.size() < 1)
+    {
+        base::log("<rotate>"
+                  " command needs at least one parameters");
+        return;
+    }
+    auto direction_str = args.front();
+    int direction = 0;
+    std::stringstream ss(direction_str);
+    ss >> direction;
+    direction = std::min(std::max(direction, -1), 1);
+
+    double angle = direction * 25.0;
+    angle += 180;
+    double ratio = angle / 360;
+    auto duty = ratio * (0.125 - 0.025) + 0.025;
+
+    task::pwm_control_task::instance().set_duty<bsd::pwm_channel::Ch1>(duty);
+    base::log("Set Rotate{ ", direction, "}");
+}
+
+void grasp_ratio(const std::vector<std::string> &args)
+{
+    using bsd::pwm;
+    if (args.size() < 1)
+    {
+        base::log("<grasp_ratio", "> command needs at least one parameter which is a "
+                                  "float between 0.0 and 100.0 number");
+        return;
+    }
+    auto ratio_str = args.front();
+    double ratio = 0;
+    std::stringstream ss(ratio_str);
+    ss >> ratio;
+    ratio = std::min(std::max(ratio, 0.0), 100.0);
+    ratio /= 100.0;
+    double angle = ratio * -50 + 40;
+    angle += 180;
+    ratio = angle / 360;
+    auto duty = ratio * (0.125 - 0.025) + 0.025;
+    task::pwm_control_task::instance().set_duty<bsd::pwm_channel::Ch2>(duty);
+    base::log("Set Grasp Ratio{ ", "Ratio: ", int(ratio * 100), "}");
 }
 
 } // namespace command_tasks

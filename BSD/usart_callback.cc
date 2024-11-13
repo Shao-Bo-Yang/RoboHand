@@ -6,12 +6,12 @@
 #include <stm32f4xx_it.h>
 #include <stm32f4xx_ll_usart.h>
 
-extern "C" const uint32_t Robo_Usart2_Rx_Buffer_Size = 512;
+extern "C" const uint32_t Robo_Usart2_Rx_Buffer_Size = 1024;
 char Robo_Usart2_Rx_Buffer[Robo_Usart2_Rx_Buffer_Size];
 uint32_t Robo_Usart2_Rx_Buffer_Head = 0;
 uint32_t Robo_Usart2_Rx_Buffer_Tail = 0;
 
-extern "C" const uint32_t Robo_Usart2_Tx_Buffer_Size = 512;
+extern "C" const uint32_t Robo_Usart2_Tx_Buffer_Size = 1024;
 char Robo_Usart2_Tx_Buffer[Robo_Usart2_Rx_Buffer_Size];
 uint32_t Robo_Usart2_Tx_Buffer_Head = 0;
 uint32_t Robo_Usart2_Tx_Buffer_Tail = 0;

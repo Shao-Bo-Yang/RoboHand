@@ -33,4 +33,8 @@ template <bsd::pwm_channel ch> void set_pwm_duty_task(const std::vector<std::str
 
 void switch_on(const std::vector<std::string> &args);
 
+void rotate(const std::vector<std::string> &args);
+
+void grasp_ratio(const std::vector<std::string> &args);
+
 } // namespace command_tasks

@@ -28,6 +28,7 @@ void work_led_task::operator()()
         led::use_device([&](led &_led) { _led.switch_led<bsd::signal_led_type::Work, false>(); });
         osDelay(100);
         led::use_device([&](led &_led) { _led.switch_led<bsd::signal_led_type::Work, true>(); });
+        osDelay(1);
     }
 }
 
